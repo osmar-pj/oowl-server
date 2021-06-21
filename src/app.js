@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import morgan from "morgan"
 import helmet from "helmet"
-import unifi from 'node-unifi'
+import mqtt from 'mqtt'
 
 import { createServer } from 'http'
 
@@ -56,15 +56,36 @@ io.on("connection", (socket) => {
   })
 })
 
-setInterval(async () => {
-  // FINISH
-  
+const options = {
+  clientId: 'SERVER-OWL',
+  username: 'ServerNode',
+  password: ''
+}
 
-  for (let i in USERS) {
-    USERS[i].emit('data', tracking)
-    USERS[i].emit('winex', winex)
+const connectUrl = 'ws://143.198.128.180:8083/mqtt'
+const client = mqtt.connect(connectUrl, options)
+client.on('connect', () => {
+  console.log('Client connected by SERVER:')
+  // Subscribe
+  client.subscribe('peru/arequipa/hunter/#', { qos: 0 })
+})
+
+let sensors = {}
+
+client.on('message', async (topic, message) => {
+  const data = JSON.parse(message.toString())
+  console.log(data)
+  if (data.alarm) {
+    sensors = data.alarm
   }
-}, 5000)
+})
+
+setInterval(async () => {
+  for (let i in USERS) {
+    USERS[i].emit('sensors', sensors)
+    // USERS[i].emit('winex', winex)
+  }
+}, 500)
 
 server.listen(4000, () => {
   console.log('server is ok')

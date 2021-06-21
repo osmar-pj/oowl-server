@@ -17,7 +17,12 @@ const userSchema = new Schema(
       unique: true,
     },
     password: String,
-    cargo: {
+    devices: [
+      {
+        type: String
+      }
+    ],
+    place: {
       type: String,
       required: true
     },
