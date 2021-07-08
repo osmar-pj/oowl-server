@@ -3,7 +3,7 @@ import Role from "../models/Role";
 
 export const createUser = async (req, res) => {
   try {
-    const { username, dni, email, cargo, password, roles } = req.body;
+    const { username, dni, email, password, roles } = req.body;
     const rolesFound = await Role.find({ name: { $in: roles } });
 
     // creating a new User
@@ -11,9 +11,8 @@ export const createUser = async (req, res) => {
       username,
       dni,
       email,
-      cargo,
       password,
-      roles: rolesFound.map((role) => role._id),
+      roles: rolesFound.map((role) => role._id)
     });
 
     // encrypting password

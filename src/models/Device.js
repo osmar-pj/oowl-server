@@ -1,11 +1,17 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import timezone from 'mongoose-timezone'
 
 const deviceSchema = new Schema(
   {
-    mac: String,
-    door: Boolean,
-    presence: Boolean
+    esp: String,
+    place: String,
+    description: String,
+    sensors: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Sensor'
+      }
+    ]
   },
   {
     timestamps: true,
@@ -13,5 +19,5 @@ const deviceSchema = new Schema(
   }
 );
 
-roleSchema.plugin(timezone)
-export default model("Role", roleSchema);
+deviceSchema.plugin(timezone)
+export default model("Device", deviceSchema)

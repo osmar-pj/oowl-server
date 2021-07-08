@@ -19,12 +19,21 @@ const userSchema = new Schema(
     password: String,
     devices: [
       {
-        type: String
+        type: Schema.Types.ObjectId,
+        ref: "Device"
       }
     ],
-    place: {
-      type: String,
-      required: true
+    active: {
+      type: Boolean,
+      default: 0
+    },
+    date_active: {
+      type: Date,
+      default: new Date()
+    },
+    date_expire: {
+      type: Date,
+      default: new Date()
     },
     roles: [
       {

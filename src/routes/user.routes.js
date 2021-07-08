@@ -7,8 +7,6 @@ import { authJwt, verifySignup } from "../middlewares";
 router.post(
   "/",
   [
-    authJwt.verifyToken,
-    authJwt.isAdmin,
     verifySignup.checkDuplicateUsernameOrEmail,
   ],
   usersCtrl.createUser

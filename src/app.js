@@ -8,12 +8,16 @@ import { createServer } from 'http'
 
 // importamos las rutas
 // import wapRoutes from "./routes/waps.routes";
+import userRoutes from './routes/user.routes'
+import deviceRoutes from './routes/device.routes'
+import InstrumentRoutes from './routes/instrument.routes'
 
 
 import { createRoles, createAdmin } from "./libs/initialSetup"
 
 // importamos los modelos
 // import Tracking from './models/Tracking'
+import House from './models/House'
 
 
 const app = express();
@@ -32,16 +36,19 @@ app.set("port", process.env.PORT || 4000);
 const corsOptions = {
   // origin: "http://localhost:3000"
 };
-app.use(cors());
-app.use(helmet());
-app.use(morgan("dev"));
-app.use(express.json());
+app.use(cors())
+app.use(helmet())
+app.use(morgan("dev"))
+app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 // Welcome Routes
 
 // Routes
 // app.use("/api/waps", wapRoutes)
+app.use('/api/auth/signin', userRoutes)
+app.use('/api/device', deviceRoutes)
+app.use('/api/instrument', InstrumentRoutes)
 
 
 // Sockets
@@ -74,13 +81,14 @@ let sensors = {}
 
 client.on('message', async (topic, message) => {
   const data = JSON.parse(message.toString())
-  console.log(data)
-  if (data.alarm) {
-    sensors = data.alarm
+  if (data) {
+    const new_device = new House(data)
+    await new_device.save()
   }
 })
 
 setInterval(async () => {
+  
   for (let i in USERS) {
     USERS[i].emit('sensors', sensors)
     // USERS[i].emit('winex', winex)
