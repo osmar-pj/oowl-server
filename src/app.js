@@ -9,8 +9,10 @@ import { createServer } from 'http'
 // importamos las rutas
 // import wapRoutes from "./routes/waps.routes";
 import userRoutes from './routes/user.routes'
+import authRoutes from './routes/auth.routes'
 import deviceRoutes from './routes/device.routes'
 import InstrumentRoutes from './routes/instrument.routes'
+import actuatorRoutes from './routes/actuator.routes'
 
 
 import { createRoles, createAdmin } from "./libs/initialSetup"
@@ -18,6 +20,7 @@ import { createRoles, createAdmin } from "./libs/initialSetup"
 // importamos los modelos
 // import Tracking from './models/Tracking'
 import House from './models/House'
+import Actuator from './models/Actuator'
 
 
 const app = express();
@@ -30,7 +33,7 @@ createRoles();
 //createAdmin(); // para mejorar el codigo del weon de fazt
 
 // Settings
-app.set("port", process.env.PORT || 4000);
+app.set("port", process.env.PORT || 3005);
 
 // Middlewares
 const corsOptions = {
@@ -46,9 +49,10 @@ app.use(express.urlencoded({ extended: false }))
 
 // Routes
 // app.use("/api/waps", wapRoutes)
-app.use('/api/auth/signin', userRoutes)
+app.use('/api/auth', authRoutes)
 app.use('/api/device', deviceRoutes)
 app.use('/api/instrument', InstrumentRoutes)
+app.use('/api/actuator', actuatorRoutes)
 
 
 // Sockets
@@ -74,13 +78,15 @@ const client = mqtt.connect(connectUrl, options)
 client.on('connect', () => {
   console.log('Client connected by SERVER:')
   // Subscribe
-  client.subscribe('peru/arequipa/hunter/#', { qos: 0 })
+  client.subscribe('alarma/sierna/#', { qos: 0 })
 })
 
 let sensors = {}
+let actuator = {}
 
 client.on('message', async (topic, message) => {
   const data = JSON.parse(message.toString())
+  console.log(data)
   if (data) {
     const new_device = new House(data)
     await new_device.save()
@@ -88,15 +94,18 @@ client.on('message', async (topic, message) => {
 })
 
 setInterval(async () => {
-  
+  const houses = await House.find({}).sort({_id: -1}).limit(1)
+  const actuator = await Actuator.find({}).sort({_id: -1}).limit(1)
+  console.log(actuator[0].sw.s)
+  sensors = houses[0].values
   for (let i in USERS) {
     USERS[i].emit('sensors', sensors)
-    // USERS[i].emit('winex', winex)
+    USERS[i].emit('actuator', actuator[0].sw.s.Stat_LedV)
   }
-}, 500)
+}, 2000)
 
-server.listen(4000, () => {
-  console.log('server is ok')
+server.listen(3005, () => {
+  console.log(`server is ok in port ${app.get('port')}`)
 })
 
 export default app
