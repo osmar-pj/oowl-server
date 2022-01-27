@@ -73,34 +73,37 @@ const options = {
   password: ''
 }
 
-const connectUrl = 'ws://143.198.128.180:8083/mqtt'
+const connectUrl = process.env.URL_MQTT
+console.log(connectUrl)
 const client = mqtt.connect(connectUrl, options)
 client.on('connect', () => {
   console.log('Client connected by SERVER:')
   // Subscribe
-  client.subscribe('alarma/sierna/#', { qos: 0 })
+  // client.subscribe('alarma/sierna/#', { qos: 0 })
+  client.subscribe('peru/#', { qos: 0 })
 })
 
 let sensors = {}
-let actuator = {}
 
 client.on('message', async (topic, message) => {
   const data = JSON.parse(message.toString())
-  console.log(data)
-  if (data) {
-    const new_device = new House(data)
-    await new_device.save()
+  // if (data) {
+  //   const new_device = new House(data)
+  //   await new_device.save()
+  // }
+  if (data.detector_rasp) {
+    sensors.ps = data.detector_rasp.values
   }
 })
 
 setInterval(async () => {
-  const houses = await House.find({}).sort({_id: -1}).limit(1)
-  const actuator = await Actuator.find({}).sort({_id: -1}).limit(1)
-  console.log(actuator[0].sw.s)
-  sensors = houses[0].values
+  // const houses = await House.find({}).sort({_id: -1}).limit(1)
+  // const actuator = await Actuator.find({}).sort({_id: -1}).limit(1)
+  // console.log(actuator[0].sw.s)
+  // sensors = houses[0].values
   for (let i in USERS) {
     USERS[i].emit('sensors', sensors)
-    USERS[i].emit('actuator', actuator[0].sw.s.Stat_LedV)
+    // USERS[i].emit('actuator', actuator[0].sw.s.Stat_LedV)
   }
 }, 2000)
 

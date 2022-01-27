@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  web:
+    container_name: severowl
+    restart: always
+    build: .
+    ports:
+      - "3005:3005"
+    links:
+      - mongo
+  mongo: #el nombre de servicio que se coloca en el programa
+    container_name: mymongo
+    image: mongo
+    ports:
+      - "27018:27017"

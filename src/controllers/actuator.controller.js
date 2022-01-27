@@ -3,6 +3,7 @@ import mqtt from 'mqtt'
 
 export const ledControl = async (req, res) => {
     try {
+        console.log(req.body)
         let control = 'LO'
         if (req.body.led) {
             control = 'LU'
@@ -27,7 +28,7 @@ export const ledControl = async (req, res) => {
 
         client.on('message', async (topic, message) => {
             const data = JSON.parse(message.toString())
-            // console.log(data)
+            console.log(data)
             if (data) {
                 const new_data = new Actuator(data)
                 new_data.save()
