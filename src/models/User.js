@@ -4,41 +4,29 @@ import timezone from 'mongoose-timezone'
 
 const userSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
-      unique: true,
+      unique: true
+    },
+    lastname: {
+      type: String,
+      unique: true
     },
     dni: {
       type: String,
-      unique: true,
+      unique: true
     },
-    email: {
-      type: String,
-      unique: true,
-    },
+    cargo: String,
+    avatar: String,
     password: String,
-    devices: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Device"
-      }
-    ],
-    active: {
+    valid: {
       type: Boolean,
-      default: 0
-    },
-    date_active: {
-      type: Date,
-      default: new Date()
-    },
-    date_expire: {
-      type: Date,
-      default: new Date()
+      default: false
     },
     roles: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Role",
+        ref: "Role"
       },
     ],
   },

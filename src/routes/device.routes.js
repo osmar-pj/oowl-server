@@ -1,10 +1,9 @@
-import {Router} from 'express'
-const router = Router()
+import { Router } from "express";
+const router = Router();
 
-import * as devicesCtrl from "../controllers/device.controller"
+import * as deviceCtrl from "../controllers/device.controller";
+import { authJwt } from "../middlewares";
 
-router.post('/', devicesCtrl.createDevice)
-router.get('/', devicesCtrl.getDevices)
-router.get('/:name', devicesCtrl.searchDevice)
+router.post('/', [authJwt.verifyToken], deviceCtrl.getDeviceControl)
 
-export default router
+export default router;

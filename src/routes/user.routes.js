@@ -9,13 +9,17 @@ router.post(
   [
     authJwt.verifyToken,
     authJwt.isAdmin,
-    verifySignup.checkDuplicateUsernameOrEmail,
+    verifySignup.checkDuplicateUsernameOrEmail
   ],
   usersCtrl.createUser
-);
+)
 
-router.get('/:name', usersCtrl.filterUsers)
+router.get('/:id', [authJwt.verifyToken, authJwt.isAdmin], usersCtrl.getWorker)
 
-router.get('/', usersCtrl.getUsers)
+router.get('/', [authJwt.verifyToken, authJwt.isAdmin] ,usersCtrl.getWorkers)
+
+router.put('/:id', [authJwt.verifyToken, authJwt.isAdmin], usersCtrl.updateWorker)
+
+router.get('/search/:name', usersCtrl.searchWorker)
 
 export default router;

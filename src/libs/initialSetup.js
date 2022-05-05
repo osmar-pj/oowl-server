@@ -1,7 +1,7 @@
-import Role from "../models/Role";
-import User from "../models/User";
+import Role from "../models/Role"
+import User from "../models/User"
 
-import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs"
 
 export const createRoles = async () => {
   try {
@@ -16,6 +16,7 @@ export const createRoles = async () => {
       new Role({ name: "user" }).save(),
       new Role({ name: "moderator" }).save(),
       new Role({ name: "admin" }).save(),
+      new Role({ name: "visit" }).save(),
     ]);
     console.log(values);
     
@@ -27,10 +28,12 @@ export const createRoles = async () => {
     if (!user) {
       // create a new admin user
       await User.create({
-        username: "winex",
-        email: "admin@winex.com",
-        cargo: "administrator",
-        password: await bcrypt.hash("admin", 10),
+        name: "Admin",
+        lastname: '',
+        dni: "42886899",
+        cargo: "Developer",
+        valid: true,
+        password: await bcrypt.hash("admin123", 10),
         roles: roles.map((role) => role._id),
       });
       console.log('Admin User Created!')
@@ -40,4 +43,4 @@ export const createRoles = async () => {
   } catch (error) {
     console.error(error);
   }
-};
+}

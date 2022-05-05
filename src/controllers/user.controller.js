@@ -3,8 +3,7 @@ import Role from "../models/Role";
 
 export const createUser = async (req, res) => {
   try {
-    console.log(req.body)
-    const { username, dni, email, password, roles } = req.body;
+    const { username, dni, email, cargo, password, roles } = req.body;
     const rolesFound = await Role.find({ name: { $in: roles } });
 
     // creating a new User
@@ -12,8 +11,9 @@ export const createUser = async (req, res) => {
       username,
       dni,
       email,
+      cargo,
       password,
-      roles: rolesFound.map((role) => role._id)
+      roles: rolesFound.map((role) => role._id),
     });
 
     // encrypting password
@@ -36,23 +36,47 @@ export const createUser = async (req, res) => {
   }
 };
 
-export const filterUsers = async (req, res) => {
+export const getWorker = async (req, res) => {
   try {
-    const { name } = req.params
-    const users = await User.find().select('username')
-    const filteredUsers = users.filter(user => {
-      return user.toString().toLowerCase().indexOf(name.toLowerCase()) >= 0
-    })
-    res.status(200).json(filteredUsers)
+    const { id } = req.params
+    const worker = await User.find({_id: id})
+    res.status(200).json(worker)
   } catch (error) {
     return res.status(500).json(error)
   }
 }
 
-export const getUsers = async (req, res) => {
+export const getWorkers = async (req, res) => {
   try {
-    const users = await User.find()
-    res.status(200).json(users)
+    const workers = await User.find({ name: { $nin: "Admin"} }).populate("roles")
+    res.status(200).json(workers)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+}
+
+export const updateWorker = async (req, res) => {
+  try {
+    const { id } = req.params
+    const valid = req.body.valid
+    const foundRoles = await Role.find({ name: { $in: req.body.newRoles } });
+    const newRoles = foundRoles.map((role) => role._id);
+    const worker = await User.findOne({_id: id})
+    await worker.updateOne({valid: valid, roles: newRoles})
+    res.status(200).json({message: "saved"})
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+}
+
+export const searchWorker = async (req, res) => {
+  try {
+    const { name } = req.params
+    const workers = await User.find({ name: { $nin: "Admin"} })
+    const filteredWorker = workers.filter(worker => {
+      return worker.toString().toLowerCase().indexOf(name.toLowerCase()) >= 0
+    })
+    res.status(200).json(filteredWorker)
   } catch (error) {
     return res.status(500).json(error)
   }

@@ -1,44 +1,17 @@
-import Device from '../models/Device'
+import mqttClient from '../mqttClient'
 
-export const createDevice = async (req, res) => {
+export const getDeviceControl = async (req, res) => {
     try {
-        const new_device = new Device(req.body)
-        await new_device.save()
-
-        res.status(200).json({
-            saved: true
-        })
-    } catch (error) {
-        console.error(error)
+      mqttClient.sendMessage('gunjop/home/doorCtrl', 'ON')
+      const last_update = new Date()
+      res.status(200).json({
+        message: last_update
+      })
     }
-}
-
-export const getDevices = async (req, res) => {
-    try {
-        const devices = await Device.find().sort({_id: 1})
-        res.status(200).json({
-            devices: devices
-        })
-    } catch (error) {
-        console.log(error)
-    }
-}
-
-export const searchDevice = async (req, res) => {
-    try {
-        console.log(req.params)
-        const name = req.params.name
-        const devices = await Device.find()
-        const nameFiltered = devices.filter(device => {
-            return device.esp
-                .toString()
-                .toLowerCase()
-                .indexOf(name.toLowerCase()) >= 0
-        })
-        res.status(200).json({
-            nameFiltered
-        })
-    } catch (error) {
-        console.log(error)
+    catch (error) {
+      console.error(error)
+      res.status(404).json({
+          message: 'Error al obtener los datos'
+      })
     }
 }

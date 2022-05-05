@@ -13,11 +13,11 @@ router.use((req, res, next) => {
 });
 
 router.post(
-  "/signup",
+  "/register",
   [verifySignup.checkDuplicateUsernameOrEmail, verifySignup.checkRolesExisted],
-  authCtrl.signUp
+  authCtrl.register
 );
 
-router.post("/signin", authCtrl.signin);
+router.post("/login", authCtrl.login);
 
 export default router;
